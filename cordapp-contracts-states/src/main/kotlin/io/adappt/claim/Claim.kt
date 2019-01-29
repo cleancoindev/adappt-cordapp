@@ -29,7 +29,7 @@ import net.corda.core.transactions.LedgerTransaction
 
 
 
-data class ClaimState(
+data class Claim(
         val applicantNode: Party,
         val insurerNode: Party,
         val fname: String,
@@ -109,7 +109,7 @@ class ClaimContract : Contract {
                     // Generic constraints around the Claim transaction.
                     "No inputs should be consumed when creating Claim Application." using (tx.inputs.isEmpty())
                     "Only one output state should be created." using (tx.outputs.size == 1)
-                    val out = tx.outputsOfType<ClaimState>().single()
+                    val out = tx.outputsOfType<Claim>().single()
                     "The Applicant and the Insurance Company cannot be the same entity." using (out.applicantNode != out.insurerNode)
                     "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
 
@@ -129,8 +129,8 @@ class ClaimContract : Contract {
                 requireThat {
                     // Generic constraints around the Claim transaction.
                     "Two output states should be created." using (tx.outputs.size == 2)
-                    val input = tx.inputsOfType<ClaimState>().single()
-                    val out = tx.outputsOfType<ClaimState>().single()
+                    val input = tx.inputsOfType<Claim>().single()
+                    val out = tx.outputsOfType<Claim>().single()
                     "The Applicant and the Insurance Company cannot be the same entity." using (out.insurerNode != out.applicantNode)
                     "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
 

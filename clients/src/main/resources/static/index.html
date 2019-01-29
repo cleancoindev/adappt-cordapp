@@ -35,7 +35,7 @@
         <script>
 
 
-    var NODE_URL = 'https://cordappscape.ngrok.io/api/dappscape/';
+    var NODE_URL = 'https://dapps.ngrok.io/api/';
     console.log(NODE_URL);
 
 
@@ -131,7 +131,7 @@
 
         var getApplicationsPromise = httpInstance.get(
             {
-                url: 'https://cordappscape.ngrok.io/api/dappscape/applications',
+                url: 'https://dapps.ngrok.io/api/getApplications',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -157,7 +157,7 @@
 
         var getMePromise = httpInstance.get(
             {
-                url: 'https://cordappscape.ngrok.io/api/dappscape/me',
+                url: 'https://dapps.ngrok.io/api/me',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -190,7 +190,7 @@
 
        var submitApplicationPromise = httpInstance.get(
            {
-               url: 'https://cordappscape.ngrok.io/api/dappscape/submit-application?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&agent=' + $scope.agent + '&policyHolder=' + $scope.policyHolder,
+               url: 'https://dapps.ngrok.io/api/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&policyHolder=' + $scope.policyHolder,
                dataType: 'json',
                method: 'GET'
            }
@@ -228,7 +228,7 @@
             <div class="slds-media__figure">
             </div>
             <div class="slds-media__body">
-                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Adappt Dashboard</h1>
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Application Dashboard</h1>
                 <p class="slds-text-body_small slds-line-height_reset">
                     ID: {{me}}
                 </p>
@@ -339,82 +339,83 @@
             </div>
         </div>
 
-
-        <div style="padding-left: 10px; padding-right: 10px">
-            <div class="" ng-show="!loadingApplications">
-                <br/>
-                <div class="slds-grid slds-grid_vertical">
-                    <div>
-                        <div class="slds-media slds-no-space slds-media_center">
-                            <div class="slds-media__figure">
-                                <div class="slds-icon_container slds-icon-standard-lead">
-                                    <svg class="slds-icon" aria-hidden="true">
-                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
-                                    </svg>
-                                    <span class="slds-assistive-text">My Applications</span>
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_10-of-12" style="padding-top:28px">
+            <div style="padding-left: 10px; padding-right: 10px">
+                <div class="" ng-show="!loadingApplications">
+                    <br/>
+                    <div class="slds-grid slds-grid_vertical">
+                        <div>
+                            <div class="slds-media slds-no-space slds-media_center">
+                                <div class="slds-media__figure">
+                                    <div class="slds-icon_container slds-icon-standard-lead">
+                                        <svg class="slds-icon" aria-hidden="true">
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
+                                        </svg>
+                                        <span class="slds-assistive-text">My Applications</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="slds-media__body">
-                                <h1 class="slds-page-header__title slds-align-middle">My Applications</h1>
-                            </div>
+                                <div class="slds-media__body">
+                                    <h1 class="slds-page-header__title slds-align-middle">My Applications</h1>
+                                </div>
 
+                            </div>
                         </div>
                     </div>
-                </div>
-                <br/>
-                <br/>
-                <div class="list-container" >
-                    <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-table_fixed-layout slds-table_cell-buffer slds-table_striped" role="grid">
-                        <thead>
-                        <tr class="slds-text-title_caps">
-                            <th scope="col">
-                                <div class="slds-truncate" title="Name">Policy Holder</div>
-                            </th>
-                            <th scope="col">
-                                <div class="slds-truncate" title="Industry">Application Name</div>
-                            </th>
-                            <th scope="col">
-                                <div class="slds-truncate" title="Industry">Application Id</div>
-                            </th>
-                            <th scope="col">
-                                <div class="slds-truncate" title="Industry">Industry</div>
-                            </th>
-                            <th scope="col">
-                                <div class="slds-truncate" title="Industry">Application Status</div>
-                            </th>
-                            <th scope="col">
-                                <div class="slds-truncate" title="Status">Agent</div>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="application in applications">
-                            <td data-label="Name">
-                                <div class="slds-truncate" title="{{application.name}}">{{application.accountId}}</div>
-                            </td>
-                            <td data-label="Type">
-                                <div class="slds-truncate" title="{{application.type}}">{{application.applicationName}}</div>
-                            </td>
-                            <td data-label="Id">
-                                <div class="slds-truncate" title="{{application.industry}">{{application.applicationId}}</div>
-                            </td>
-                            <td data-label="Industry">
-                                <div class="slds-truncate" title="{{application.industry}">{{application.industry}}</div>
-                            </td>
-                            <td data-label="Phone">
-                                <div class="slds-truncate" title="{{application.phone}">{{application.applicationStatus}}</div>
-                            </td>
-                            <td data-label="Agent">
-                                <div class="slds-truncate" title="{{application.owner}">{{application.agent}}</div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <br/><br/>
+                    <br/>
+                    <br/>
+                    <div class="list-container" >
+                        <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-table_fixed-layout slds-table_cell-buffer slds-table_striped" role="grid">
+                            <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Name">Policy Holder</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Industry">Application Name</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Industry">Application Id</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Industry">Industry</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Industry">Application Status</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Status">Agent</div>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="application in applications">
+                                <td data-label="Name">
+                                    <div class="slds-truncate" title="{{application.name}}">{{application.accountId}}</div>
+                                </td>
+                                <td data-label="Type">
+                                    <div class="slds-truncate" title="{{application.type}}">{{application.applicationName}}</div>
+                                </td>
+                                <td data-label="Id">
+                                    <div class="slds-truncate" title="{{application.industry}">{{application.applicationId}}</div>
+                                </td>
+                                <td data-label="Industry">
+                                    <div class="slds-truncate" title="{{application.industry}">{{application.industry}}</div>
+                                </td>
+                                <td data-label="Phone">
+                                    <div class="slds-truncate" title="{{application.phone}">{{application.applicationStatus}}</div>
+                                </td>
+                                <td data-label="Agent">
+                                    <div class="slds-truncate" title="{{application.owner}">{{application.agent}}</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <br/><br/>
 
+                    </div>
                 </div>
+
             </div>
-
         </div>
     </div>
 
@@ -506,4 +507,4 @@
 
 
     </body>
-    </html>
+</html>

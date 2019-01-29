@@ -4,14 +4,14 @@
 
         <title>Adappt Underwriting Dashboard</title>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script value="{!URLFOR($Resource.lightning)}/angular.min.js" />
-        <script value="{!URLFOR($Resource.lightning)}/myApp.js" />
-        <link rel="stylesheet" type="text/css" href="https://www.lightningdesignsystem.com/assets/styles/slds.css"/>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.7.5/styles/salesforce-lightning-design-system.css" rel="stylesheet" type="text/css" />
         <script>
         var resourcePath = "{!URLFOR($Resource.lightning)}";
         resourcePath = resourcePath + '/';
         myApp.value('resourcePath', resourcePath);
-    </script>
+        </script>
 
         <style>
             .element-container{
@@ -228,7 +228,7 @@
             <div class="slds-media__figure">
             </div>
             <div class="slds-media__body">
-                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Application Dashboard</h1>
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Adappt Dashboard</h1>
                 <p class="slds-text-body_small slds-line-height_reset">
                     ID: {{me}}
                 </p>

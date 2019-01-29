@@ -196,4 +196,41 @@ class RestController(
     }
 
 
+
+
+    @PostMapping(value = "/createApplication")
+    fun createApplication(@RequestParam("accountId") agreementNumber: String,
+                        @RequestParam("applicationId") agreementName: String,
+                        @RequestParam("applicationName") agreementStatus: AgreementStatus,
+                        @RequestParam("industry") agreementType: AgreementType,
+                        @RequestParam("applicationStatus") totalAgreementValue: Int,
+                        @RequestParam("partyName") partyName: CordaX500Name?): ResponseEntity<Any?> {
+
+        if (totalAgreementValue <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Query parameter 'total agreement value' must be non-negative.\n")
+        }
+        if (partyName == null) {
+            return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
+        }
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(partyName)
+                ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $partyName cannot be found.\n")
+
+        val (status, message) = try {
+
+
+            val flowHandle = proxy.startFlowDynamic(CreateApplicationFlow::Initiator, accountId, applicationId, applicationName, industry, applicationStatus, otherParty).returnValue.getOrThrow()
+
+            val result = flowHandle.use { it.returnValue.getOrThrow() }
+
+            HttpStatus.CREATED to "Transaction id ${result.tx.id} committed to ledger.\n${result.tx.outputs.single().data}"
+
+        } catch (e: Exception) {
+            HttpStatus.BAD_REQUEST to e.message
+        }
+        logger.info(message)
+        return ResponseEntity<Any?>(message, status)
+    }
+
+
 }

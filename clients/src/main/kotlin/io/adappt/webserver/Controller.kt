@@ -21,6 +21,7 @@ import io.adappt.*
 import io.adappt.agreement.Agreement
 import io.adappt.agreement.AgreementStatus
 import io.adappt.agreement.AgreementType
+import io.adappt.application.ApplicationStatus
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
@@ -199,16 +200,12 @@ class RestController(
 
 
     @PostMapping(value = "/createApplication")
-    fun createApplication(@RequestParam("accountId") agreementNumber: String,
-                        @RequestParam("applicationId") agreementName: String,
-                        @RequestParam("applicationName") agreementStatus: AgreementStatus,
-                        @RequestParam("industry") agreementType: AgreementType,
-                        @RequestParam("applicationStatus") totalAgreementValue: Int,
+    fun createApplication(@RequestParam("applicationId") applicationId: String,
+                        @RequestParam("applicationName") applicationName: String,
+                        @RequestParam("industry") industry: String,
+                        @RequestParam("applicationStatus") applicationStatus: ApplicationStatus,
                         @RequestParam("partyName") partyName: CordaX500Name?): ResponseEntity<Any?> {
 
-        if (totalAgreementValue <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Query parameter 'total agreement value' must be non-negative.\n")
-        }
         if (partyName == null) {
             return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
         }
@@ -219,7 +216,7 @@ class RestController(
         val (status, message) = try {
 
 
-            val flowHandle = proxy.startFlowDynamic(CreateApplicationFlow::Initiator, accountId, applicationId, applicationName, industry, applicationStatus, otherParty).returnValue.getOrThrow()
+            val flowHandle = proxy.startFlowDynamic(CreateApplicationFlow.Initiator::class.java, applicationId, applicationName, industry, applicationStatus, otherParty)
 
             val result = flowHandle.use { it.returnValue.getOrThrow() }
 
@@ -230,6 +227,34 @@ class RestController(
         }
         logger.info(message)
         return ResponseEntity<Any?>(message, status)
+    }
+
+
+    @PostMapping(value = "/approveApplication", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=applcation/x-www-form-urlencoded"))
+    fun approveApplication(@RequestParam("applicationId") applicationId: String, request: HttpServletRequest): ResponseEntity<String> {
+        val applicationId = request.getParameter("applicationId")
+        val flow = rpc.proxy.startFlowDynamic(ApproveApplicationFlow::class.java, applicationId)
+
+        return try {
+            flow.returnValue.getOrThrow()
+            ResponseEntity.ok("Application $applicationId approved")
+        } catch (e: TransactionVerificationException.ContractRejection) {
+            ResponseEntity.badRequest().body("The Application was not approved. ")
+        }
+    }
+
+
+    @PostMapping(value = "/rejectApplication", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=applcation/x-www-form-urlencoded"))
+    fun rejectApplication(@RequestParam("applicationId") applicationId: String, request: HttpServletRequest): ResponseEntity<String> {
+        val applicationId = request.getParameter("applicationId")
+        val flow = rpc.proxy.startFlowDynamic(RejectApplicationFlow::class.java, applicationId)
+
+        return try {
+            flow.returnValue.getOrThrow()
+            ResponseEntity.ok("Application $applicationId rejected")
+        } catch (e: TransactionVerificationException.ContractRejection) {
+            ResponseEntity.badRequest().body("The Application was not rejected ")
+        }
     }
 
 

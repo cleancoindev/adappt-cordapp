@@ -28,9 +28,9 @@ object CreateApplicationFlow {
     @StartableByRPC
     @InitiatingFlow
     @Suspendable
-    class Initiator(val accountId: String,
-                    val applicationId: String,
+    class Initiator(val applicationId: String,
                     val applicationName: String,
+                    val industry: String,
                     val applicationStatus: ApplicationStatus,
                     val otherParty: Party) : FlowLogic<SignedTransaction>() {
 
@@ -66,7 +66,7 @@ object CreateApplicationFlow {
             val notary = serviceHub.networkMapCache.notaryIdentities[0]
             progressTracker.currentStep = GENERATING_TRANSACTION
 
-            val applicationState = Application(accountId, applicationId, applicationName, applicationStatus, serviceHub.myInfo.legalIdentities.first(), otherParty)
+            val applicationState = Application(applicationId, applicationName, industry, applicationStatus, serviceHub.myInfo.legalIdentities.first(), otherParty)
             val txCommand = Command(ApplicationContract.Commands.CreateApplication(), applicationState.participants.map { it.owningKey })
             progressTracker.currentStep = VERIFYING_TRANSACTION
             val txBuilder = TransactionBuilder(notary)

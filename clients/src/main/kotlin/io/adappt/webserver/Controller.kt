@@ -21,6 +21,7 @@ import io.adappt.*
 import io.adappt.agreement.Agreement
 import io.adappt.agreement.AgreementStatus
 import io.adappt.agreement.AgreementType
+import io.adappt.application.Application
 import io.adappt.application.ApplicationStatus
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
@@ -60,6 +61,14 @@ class RestController(
     private fun Agreement.toJson(): Map<String, String> {
         return kotlin.collections.mapOf("party" to party.name.organisation, "counterparty" to counterparty.name.toString(), "agreement" to agreementNumber)
     }
+
+
+    /** Maps an Application to a JSON object. */
+
+    private fun Application.toJson(): Map<String, String> {
+        return kotlin.collections.mapOf("party" to agent.name.organisation, "counterparty" to provider.name.toString(), "application" to applicationId)
+    }
+
 
 
     /** Returns the node's name. */
@@ -102,6 +111,18 @@ class RestController(
         return agreementStates.map { it.toJson() }
     }
 
+
+    /** Returns a list of existing Applications. */
+
+    @GetMapping(value = "/getApplications", produces = arrayOf("application/json"))
+    fun getApplications(): List<Map<String, String>> {
+        val applicationStateAndRefs = rpc.proxy.vaultQueryBy<Application>().states
+        val applicationStates = applicationStateAndRefs.map { it.state.data }
+        return applicationStates.map { it.toJson() }
+    }
+
+
+    /** Creates an Agreement. */
 
     @PostMapping(value = "/createAgreement")
     fun createAgreement(@RequestParam("agreementNumber") agreementNumber: String,

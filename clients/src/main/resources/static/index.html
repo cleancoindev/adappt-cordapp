@@ -181,16 +181,15 @@
         reqObj.applicationId=$scope.applicationId;
         reqObj.applicationName=$scope.applicationName;
         reqObj.industry=$scope.industry;
-        reqObj.applicationStatus=$scope.status;
-        reqObj.agent=$scope.agent;
-        reqObj.policyHolder=$scope.policyHolder;
+        reqObj.applicationStatus=$scope.applicationStatus;
+        reqObj.partyName=$scope.partyName;
         $scope.showTransferSpinner = true;
 
        var dataStr = JSON.stringify(reqObj);
 
        var submitApplicationPromise = httpInstance.get(
            {
-               url: 'https://dapps.ngrok.io/api/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&policyHolder=' + $scope.policyHolder,
+               url: 'https://dapps.ngrok.io/api/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.applicationStatus + '&partyName=' + $scope.partyName,
                dataType: 'json',
                method: 'GET'
            }
@@ -335,6 +334,16 @@
                             <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">All Policies</a></li>
                         </ul>
                     </div>
+                    <div class="slds-nav-vertical__section">
+                        <h2 style="font-weight: bold" class="slds-nav-vertical__title">Claims</h2>
+                        <ul aria-describedby="entity-header">
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Recent</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Created by Me</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Submitted Claims</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Historical Claims</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">All Claims</a></li>
+                        </ul>
+                    </div>
                 </nav>
             </div>
         </div>
@@ -453,10 +462,6 @@
                 </header>
                 <form style="padding-left:8px; padding-right:8px; padding-top:28px; padding-bottom:28px" class="slds-card slds-form--stacked">
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Account ID / アカウントID:</label>
-                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="accountId" />
-                    </div>
-                    <div class="slds-form-element">
                         <label class="slds-form-element__label">Application Name: / アプリケーション名:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationName" />
                     </div>
@@ -464,11 +469,6 @@
                     <div class="slds-form-element">
                         <label class="slds-form-element__label">Application Number / アプリケーションID:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationId" />
-                    </div>
-
-                    <div class="slds-form-element">
-                        <label class="slds-form-element__label">Company / 会社名:</label>
-                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="companyName" />
                     </div>
 
                     <div class="slds-form-element">
@@ -487,7 +487,7 @@
                         </div>
                     </div>
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Provider / ポリシー保有者:</label>
+                        <label class="slds-form-element__label">Applicant / ポリシー保有者:</label>
                         <input type="text" name="company" class="slds-input slds-combobox__input" ng-model="partyName" />
                     </div>
 

@@ -240,7 +240,7 @@ class RestController(
 
 
 
-    @PostMapping(value = "/createApplication")
+    @GetMapping(value = "/createApplication")
     fun createApplication(@RequestParam("applicationId") applicationId: String,
                         @RequestParam("applicationName") applicationName: String,
                         @RequestParam("industry") industry: String,

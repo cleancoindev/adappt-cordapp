@@ -21,7 +21,7 @@ package io.adappt.policy
 import net.corda.core.serialization.CordaSerializable
 
 /**
- * @param basics male, female or intersex
+ * @param basics basics
  * @param medical in years
  * @param financials in centimeters
  * @param diet in kilograms

@@ -1,5 +1,6 @@
 package io.adappt.charge
 
+import io.adappt.application.Application
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.Party
@@ -17,6 +18,7 @@ data class Charge(val accountId: String,
                   val currency: Currency,
                   val party: Party,
                   val counterparty: Party,
+                  val application: Application,
                   val paid: Boolean,
                   val status: ChargeStatus,
                   override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState {

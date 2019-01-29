@@ -1,10 +1,509 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Example front-end.</title>
-</head>
-<body>
-    <div>Define your front-end here.</div>
-</body>
-</html>
+    <html ng-app="MyApp">
+    <head>
+
+        <title>Adappt Underwriting Dashboard</title>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script value="{!URLFOR($Resource.lightning)}/angular.min.js" />
+        <script value="{!URLFOR($Resource.lightning)}/myApp.js" />
+        <link rel="stylesheet" type="text/css" href="https://www.lightningdesignsystem.com/assets/styles/slds.css"/>
+        <script>
+        var resourcePath = "{!URLFOR($Resource.lightning)}";
+        resourcePath = resourcePath + '/';
+        myApp.value('resourcePath', resourcePath);
+    </script>
+
+        <style>
+            .element-container{
+                width: 50%;
+                height: 100%;
+                padding-right: 10px;
+                padding-left: 10px;
+             }
+             .divider{
+                border-right: 1px solid lightgrey;
+             }
+
+             .list-container{
+                max-height: 375px;
+                overflow: auto;
+             }
+
+            </style>
+
+
+        <script>
+
+
+    var NODE_URL = 'https://cordappscape.ngrok.io/api/dappscape/';
+    console.log(NODE_URL);
+
+
+        axios.defaults.headers.post['Content-Type'] = 'application/json';
+        axios.defaults.headers.post['Authorization'] = 'Negotiate';
+
+        var HTTPUtil = function(instanceConfig){
+            var self = this;
+
+
+            self.put = function(config){
+                var _url = config.url ? config.url : (instanceConfig && instanceConfig.url ? instanceConfig.url : defaulsConfig.url);
+                var _data = config.data;
+
+                return  axios.put(_url,_data);
+            }
+
+             self.get = function(config){
+                var _url = config.url ? config.url : (instanceConfig && instanceConfig.url ? instanceConfig.url : defaulsConfig.url);
+                var _data = config.data;
+
+                return  axios.get(_url,_data);
+            }
+
+
+        }
+
+        var httpInstance = new HTTPUtil();
+
+
+
+                var decodeJSON = function(jsonStr){
+                  if(!jsonStr){
+                    return undefined;
+                  }
+                    return jsonStr.replace(/(&quot\;)/g,"\"")
+                }
+
+                var parseJSON = function(str){
+                    if(str==null || str == undefined || str == ''){
+                        return {};
+                    }
+                    else return JSON.parse(str);
+                }
+
+    var myApp = angular.module('MyApp',[]);
+    function MyController($scope,$timeout){
+
+
+    $scope.showTeikoku = false;
+    $scope.showApplicationModal = false;
+
+
+    $scope.showTeikokuFn = function(sendType,methodName){
+    $scope.showTeikoku = true;
+    lastSendType = sendType;
+    lastMethodName = methodName;
+
+        }
+
+
+    $scope.showApplicationModalFn = function(sendType,methodName){
+    $scope.showApplicationModal = true;
+    lastSendType = sendType;
+    lastMethodName = methodName;
+
+        }
+
+
+    $scope.msg = [];
+    $scope.addMsg = function(msg){
+           $scope.msg.push(msg);
+        }
+
+
+    $scope.message = 'This is Message';
+
+    $scope.loadingApplications = false;
+
+
+    $scope.hideApplicationModal  = function(){
+         $scope.showApplicationModal = false;
+    }
+
+    $scope.hideTeikoku = function(){
+        $scope.showTeikoku = false;
+
+        }
+
+
+    $scope.getApplications = function(){
+	$scope.loadingApplications = true;
+
+        var getApplicationsPromise = httpInstance.get(
+            {
+                url: 'https://cordappscape.ngrok.io/api/dappscape/applications',
+                dataType: 'json',
+                method: 'GET'
+            }
+
+            );
+                getApplicationsPromise.then(function (response) {
+                    console.log(response);
+                    $scope.applications = response.data;
+                    $scope.loadingApplications = false;
+                    $scope.$apply();
+
+                    }).catch(function (error) {
+                    console.log(error);
+                    });
+
+                if($scope.applications && $scope.applications.length > 0){
+                    $scope.step = 'VIEW_APPLICATIONS';
+                }
+            }
+
+      $scope.getMe = function(){
+	  $scope.loadingMe = true;
+
+        var getMePromise = httpInstance.get(
+            {
+                url: 'https://cordappscape.ngrok.io/api/dappscape/me',
+                dataType: 'json',
+                method: 'GET'
+            }
+
+            );
+                getMePromise.then(function (response) {
+                    console.log(response);
+                    $scope.me = response.data.me;
+                    $scope.loadingMe = false;
+                    $scope.$apply();
+
+                    }).catch(function (error) {
+                    console.log(error);
+                    });
+
+            }
+
+      $scope.submitApplication = function() {
+
+       var reqObj = {};
+        reqObj.applicationId=$scope.applicationId;
+        reqObj.applicationName=$scope.applicationName;
+        reqObj.industry=$scope.industry;
+        reqObj.applicationStatus=$scope.status;
+        reqObj.agent=$scope.agent;
+        reqObj.policyHolder=$scope.policyHolder;
+        $scope.showTransferSpinner = true;
+
+       var dataStr = JSON.stringify(reqObj);
+
+       var submitApplicationPromise = httpInstance.get(
+           {
+               url: 'https://cordappscape.ngrok.io/api/dappscape/submit-application?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&agent=' + $scope.agent + '&policyHolder=' + $scope.policyHolder,
+               dataType: 'json',
+               method: 'GET'
+           }
+
+           );
+              submitApplicationPromise.then(function (response) {
+                    console.log(response);
+                    $scope.showTransferSpinner = false;
+                    $scope.showMessage = "Success: "+ response;
+                    $scope.$apply();
+                  }).catch(function (error) {
+                    console.log(error);
+                    });
+
+            }
+
+
+     $scope.getApplications();
+     $scope.getMe();
+
+        }
+
+
+        myApp.controller('MyController', MyController);
+
+
+    </script>
+
+    </head>
+    <body ng-controller="MyController">
+
+
+    <div class="slds-page-header">
+        <div class="slds-media">
+            <div class="slds-media__figure">
+            </div>
+            <div class="slds-media__body">
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Application Dashboard</h1>
+                <p class="slds-text-body_small slds-line-height_reset">
+                    ID: {{me}}
+                </p>
+            </div>
+            <div class="slds-page-header__control">
+                <ul class="slds-button-group-list">
+                    <li>
+                        <button class="slds-button slds-button_neutral" ng-click="showApplicationModalFn('Transfer')">Create Application</button>
+                    </li>
+                    <li>
+                        <button class="slds-button slds-button_neutral" ng-click="showTeikokuFn('Transfer')">Teikoku Check</button>
+                    </li>
+                    <li>
+                        <button class="slds-button slds-button_neutral" ng-click="">Approve</button>
+                    </li>
+                    <li>
+                        <button class="slds-button slds-button_neutral" ng-click="">Reject</button>
+                    </li>
+                    <li>
+                        <button class="slds-button slds-button_neutral" ng-click="">Upload File</button>
+                    </li>
+                    <li>
+                        <button class="slds-button slds-button_neutral" ng-click="">Review</button>
+                    </li>
+                    <li>
+                        <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                            <button class="slds-button slds-button_icon slds-button_icon-border-filled" aria-haspopup="true" title="More Actions">
+                                <svg class="slds-button__icon" aria-hidden="true">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#down" />
+                                </svg>
+                                <span class="slds-assistive-text">More Actions</span>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="slds-progress-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25" role="progressbar">
+  <span class="slds-progress-bar__value_success" style="width: 75%;">
+    <span class="slds-assistive-text">Progress: 25%</span>
+  </span>
+    </div>
+    <div class="slds-grid slds-gutters">
+    </div>
+
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_2-of-12" style="padding-left:8px; padding-bottom:28px">
+
+            <div class="demo-only" style="width: 280px; background-color: rgb(250, 250, 251);">
+                <nav class="slds-nav-vertical" aria-label="Sub page">
+                    <br/>
+                    <div class="slds-form-element slds-p-horizontal_large">
+                        <label class="slds-form-element__label slds-assistive-text" for="input-id-01">Filter navigation items</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+        <span class="slds-icon_container slds-icon-utility-search">
+          <svg class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" aria-hidden="true">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#search" />
+          </svg>
+        </span>
+                            <input type="search" id="input-id-01" placeholder="Quick Find" class="slds-input" value="" />
+                        </div>
+                    </div>
+                    <div class="slds-nav-vertical__section">
+                        <h2 style="font-weight: bold" class="slds-nav-vertical__title">Applications</h2>
+                        <ul aria-describedby="entity-header">
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Recent</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Created by Me</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Approved Applications</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Rejected Applications</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">All Applications</a></li>
+                        </ul>
+                    </div>
+                    <div class="slds-nav-vertical__section">
+                        <h2 style="font-weight: bold" class="slds-nav-vertical__title">Attachments</h2>
+                        <ul aria-describedby="folder-header">
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Created by Me</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Shared with Me</a></li>
+                            <div class="slds-form-element">
+                                <div class="slds-form-element__control" style="padding-left:8px">
+                                    <div class="slds-file-selector slds-file-selector_files">
+                                        <div class="slds-file-selector__dropzone">
+                                            <input class="slds-file-selector__input slds-assistive-text" accept="image/png" type="file" id="file-upload-input-01" aria-labelledby="file-selector-primary-label file-selector-secondary-label" />
+                                            <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+          <span class="slds-file-selector__button slds-button slds-button_neutral">
+            <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#upload" />
+            </svg>Upload Files</span>
+                                                <span class="slds-file-selector__text slds-medium-show">or Drop Files</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+                    <div class="slds-nav-vertical__section">
+                        <h2 style="font-weight: bold" class="slds-nav-vertical__title">Policies</h2>
+                        <ul aria-describedby="entity-header">
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Recent</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Created by Me</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Draft Policies</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Active Policies</a></li>
+                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">All Policies</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+
+        <div style="padding-left: 10px; padding-right: 10px">
+            <div class="" ng-show="!loadingApplications">
+                <br/>
+                <div class="slds-grid slds-grid_vertical">
+                    <div>
+                        <div class="slds-media slds-no-space slds-media_center">
+                            <div class="slds-media__figure">
+                                <div class="slds-icon_container slds-icon-standard-lead">
+                                    <svg class="slds-icon" aria-hidden="true">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text">My Applications</span>
+                                </div>
+                            </div>
+                            <div class="slds-media__body">
+                                <h1 class="slds-page-header__title slds-align-middle">My Applications</h1>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <br/>
+                <div class="list-container" >
+                    <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-table_fixed-layout slds-table_cell-buffer slds-table_striped" role="grid">
+                        <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col">
+                                <div class="slds-truncate" title="Name">Policy Holder</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Industry">Application Name</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Industry">Application Id</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Industry">Industry</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Industry">Application Status</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Status">Agent</div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="application in applications">
+                            <td data-label="Name">
+                                <div class="slds-truncate" title="{{application.name}}">{{application.accountId}}</div>
+                            </td>
+                            <td data-label="Type">
+                                <div class="slds-truncate" title="{{application.type}}">{{application.applicationName}}</div>
+                            </td>
+                            <td data-label="Id">
+                                <div class="slds-truncate" title="{{application.industry}">{{application.applicationId}}</div>
+                            </td>
+                            <td data-label="Industry">
+                                <div class="slds-truncate" title="{{application.industry}">{{application.industry}}</div>
+                            </td>
+                            <td data-label="Phone">
+                                <div class="slds-truncate" title="{{application.phone}">{{application.applicationStatus}}</div>
+                            </td>
+                            <td data-label="Agent">
+                                <div class="slds-truncate" title="{{application.owner}">{{application.agent}}</div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br/><br/>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!--Signer Modal -->
+    <div class="demo-only" style="min-height:640px;margin-top: 0px !important;" ng-show="showApplicationModal">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideApplicationModal()">
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                        </svg>
+                        <span class="slds-assistive-text" >Close</span>
+                    </button>
+                    <table>
+                        <tr>
+                            <td style="max-width: 17px;">
+                    <span class="slds-icon_container slds-icon-custom-custom5" title="Description of icon when needed">
+                      <svg class="slds-icon slds-icon_large" aria-hidden="true">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
+                      </svg>
+                      <span class="slds-assistive-text">Description of icon</span>
+                    </span>
+                            </td>
+                            <td>
+                                <h2 id="modal-heading-01" style="padding-left:17px" class="slds-text-heading_small slds-hyphenate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Application</h2>
+                                <p class="slds-text-body_small slds-line-height_reset" style="padding-left:17px">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a New Application
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+
+                </header>
+                <form style="padding-left:8px; padding-right:8px; padding-top:28px; padding-bottom:28px" class="slds-card slds-form--stacked">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Account ID / アカウントID:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="accountId" />
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Application Name: / アプリケーション名:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationName" />
+                    </div>
+
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Application Number / アプリケーションID:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationId" />
+                    </div>
+
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Company / 会社名:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="companyName" />
+                    </div>
+
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Industry / 業界:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="industry" />
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Status / アプリケーションの状態:</label>
+                        <div class="slds-select_container">
+                            <select name="gender" class="slds-select" ng-model="applicationStatus" >
+                                <option value="NEW">New</option>
+                                <option value="REQUESTED">Request</option>
+                                <option value="STARTED">Started</option>
+                                <option value="WORKING">Working</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Provider / ポリシー保有者:</label>
+                        <input type="text" name="company" class="slds-input slds-combobox__input" ng-model="partyName" />
+                    </div>
+
+                </form>
+
+                <footer class="slds-modal__footer">
+                    <br/>
+                    <button  class="slds-button slds-button--brand" ng-click="submitApplication()">Submit / アプリケーションを提出する</button>
+                    <img src="https://i.stack.imgur.com/pK4a5.gif" style="width:30px;" ng-show="showTransferSpinner"/>
+                    {{showMessage}}
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+
+
+
+    </body>
+    </html>

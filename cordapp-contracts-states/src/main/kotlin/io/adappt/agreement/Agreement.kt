@@ -116,7 +116,7 @@ enum class AgreementType {
 class AgreementContract : Contract {
     // This is used to identify our contract when building a transaction
     companion object {
-        val AGREEMENT_CONTRACT_ID = "io.dsoa.AgreementContract"
+        val AGREEMENT_CONTRACT_ID = AgreementContract::class.java.canonicalName
     }
 
     // Used to indicate the transaction's intent.

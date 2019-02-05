@@ -155,7 +155,7 @@ class RestController(
             //  @RequestParam("active") active: Boolean,
             //  @RequestParam("createdAt") createdAt: String,
             //  @RequestParam("lastUpdated") lastUpdated: String,
-                        @RequestParam("counterpartyName") counterpartyName: CordaX500Name?): ResponseEntity<Any?> {
+                        @RequestParam("counterpartyName") counterpartyName: String?): ResponseEntity<Any?> {
 
         if (totalAgreementValue <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Query parameter 'total agreement value' must be non-negative.\n")
@@ -164,7 +164,9 @@ class RestController(
             return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
         }
 
-        val otherParty = proxy.wellKnownPartyFromX500Name(counterpartyName)
+        val counterparty = CordaX500Name.parse(counterpartyName)
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(counterparty)
                 ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $counterpartyName cannot be found.\n")
 
         val (status, message) = try {

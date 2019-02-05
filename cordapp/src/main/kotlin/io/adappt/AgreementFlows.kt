@@ -19,6 +19,7 @@ package io.adappt
 import co.paralleluniverse.fibers.Suspendable
 import io.adappt.agreement.Agreement
 import io.adappt.agreement.AgreementContract
+import io.adappt.agreement.AgreementContract.Companion.AGREEMENT_CONTRACT_ID
 import io.adappt.agreement.AgreementStatus
 import io.adappt.agreement.AgreementType
 import net.corda.core.contracts.Command
@@ -386,14 +387,3 @@ object CreateAgreementFlow {
         }
     }
 }
-
-
-
-
-
-const val AGREEMENT_CONTRACT_ID = "io.adappt.AgreementContract"
-
-const val AGREEMENT_LINEITEM_CONTRACT_ID = "io.adappt.AgreementLineItemContract"
-
-const val ATTACHMENT_ID = "io.adappt.AttachmentContract"
-

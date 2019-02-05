@@ -2,6 +2,7 @@ package io.adappt
 
 import co.paralleluniverse.fibers.Suspendable
 import io.adappt.application.Application
+import io.adappt.application.ApplicationContract.Companion.APPLICATION_CONTRACT_ID
 import io.adappt.application.ApplicationStatus
 import io.adappt.policy.ApplicationContract
 import net.corda.core.contracts.Command
@@ -201,6 +202,3 @@ class RejectApplicationFlow(val applicationId: String) : FlowLogic<SignedTransac
         return subFlow(FinalityFlow(stx))
     }
 }
-
-
-const val APPLICATION_CONTRACT_ID = "io.adappt.ApplicationContract"

@@ -60,21 +60,41 @@ class RestController(
     /** Maps an Agreement to a JSON object. */
 
     private fun Agreement.toJson(): Map<String, String> {
-        return kotlin.collections.mapOf("party" to party.name.organisation, "counterparty" to counterparty.name.toString(), "agreement" to agreementNumber)
+        return kotlin.collections.mapOf("party" to party.name.organisation,
+                                        "counterparty" to counterparty.name.organisation,
+                                        "agreementName" to agreementName,
+                                        "agreementNumber" to agreementNumber,
+                                        "agreementStatus" to agreementStatus.toString(),
+                                        "totalAgreementValue" to totalAgreementValue.toString(),
+                                        "linearId" to linearId.toString(),
+                                        "agreementType" to agreementType.toString())
     }
 
 
     /** Maps an Application to a JSON object. */
 
     private fun Application.toJson(): Map<String, String> {
-        return kotlin.collections.mapOf("party" to agent.name.organisation, "counterparty" to provider.name.toString(), "application" to applicationId)
+        return kotlin.collections.mapOf(
+                "agent" to agent.name.organisation,
+                "provider" to provider.name.organisation,
+                "counterparty" to provider.name.toString(),
+                "applicationId" to applicationId,
+                "applicationName" to applicationName,
+                "industry" to industry,
+                "applicationStatus" to applicationStatus.toString())
     }
+
+
+
+
 
 
     /** Maps an Claims to a JSON object. */
 
     private fun Claim.toJson(): Map<String, String> {
-        return kotlin.collections.mapOf("application" to applicantNode.name.organisation, "insurer" to insurerNode.name.toString(), "claim" to referenceID)
+        return kotlin.collections.mapOf("application" to applicantNode.name.organisation,
+                                        "insurer" to insurerNode.name.toString(),
+                                        "claim" to referenceID)
     }
 
 
@@ -242,18 +262,20 @@ class RestController(
 
 
 
-    @GetMapping(value = "/createApplication")
+    @PostMapping(value = "/createApplication")
     fun createApplication(@RequestParam("applicationId") applicationId: String,
                         @RequestParam("applicationName") applicationName: String,
                         @RequestParam("industry") industry: String,
                         @RequestParam("applicationStatus") applicationStatus: ApplicationStatus,
-                        @RequestParam("partyName") partyName: CordaX500Name?): ResponseEntity<Any?> {
+                        @RequestParam("partyName") partyName: String?): ResponseEntity<Any?> {
 
         if (partyName == null) {
             return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
         }
 
-        val otherParty = proxy.wellKnownPartyFromX500Name(partyName)
+        val counterparty = CordaX500Name.parse(partyName)
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(counterparty)
                 ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $partyName cannot be found.\n")
 
         val (status, message) = try {

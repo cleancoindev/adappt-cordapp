@@ -191,7 +191,7 @@
            {
                url: 'https://dapps.ngrok.io/api/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.applicationStatus + '&partyName=' + $scope.partyName,
                dataType: 'json',
-               method: 'GET'
+               method: 'POST'
            }
 
            );
@@ -205,6 +205,43 @@
                     });
 
             }
+
+
+                  // Create Agreement Function
+
+     $scope.createAgreement = function() {
+
+       var reqObj = {};
+        reqObj.accountId=$scope.accountId;
+        reqObj.agreementNumber=$scope.agreementNumber;
+        reqObj.agreementName=$scope.agreementName;
+        reqObj.agreementType=$scope.agreementType;
+        reqObj.agreementStatus=$scope.agreementStatus;
+        reqObj.totalAgreementValue=$scope.totalAgreementValue;
+        reqObj.partyName=$scope.partyName;
+        $scope.showTransferSpinner = true;
+
+       var dataStr = JSON.stringify(reqObj);
+
+       var createAgreementPromise = httpInstance.post(
+           {
+               url: 'https://dapps.ngrok.io/api/createAgreement?agreementNumber=' + $scope.agreementNumber + '&agreementName=' + $scope.agreementName + '&agreementStatus=' + $scope.agreementStatus + '&agreementType=' + $scope.agreementType + '&totalAgreementValue=' + $scope.totalAgreementValue + '&partyName=' + $scope.partyName,
+               dataType: 'json',
+               method: 'POST'
+           }
+
+           );
+              createAgreementPromise.then(function (response) {
+                	console.log(response);
+                    $scope.showTransferSpinner = false;
+					$scope.showMessage = "dsoa: "+ response.data;
+                    $scope.$apply();
+                    $scope.showAlert = false;
+                  }).catch(function (error) {
+                    console.log(error);
+                    });
+
+    		}
 
 
      $scope.getApplications();

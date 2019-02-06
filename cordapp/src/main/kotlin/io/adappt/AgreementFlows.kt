@@ -150,11 +150,11 @@ class RenewAgreementFlow(val agreementNumber: String) : FlowLogic<SignedTransact
                 agreement.counterparty,
                 // agreement.agreementStartDate,
                 // agreement.agreementEndDate,
-                //  agreement.agreementLineItem,
+                // agreement.agreementLineItem,
                 // agreement.attachmentId,
-                //  agreement.active,
-                //  agreement.createdAt,
-                //  agreement.lastUpdated,
+                // agreement.active,
+                // agreement.createdAt,
+                // agreement.lastUpdated,
                 agreement.linearId)
 
         // Building the transaction.

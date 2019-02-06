@@ -191,7 +191,7 @@ class RestController(
 
         val (status, message) = try {
 
-            //  val flowHandle = rpc.proxy.startFlowDynamic(CreateAgreementFlow.Initiator::class.java, agreementNumber, agreementName, agreementStatus, agreementType, totalAgreementValue, agreementStartDate, agreementEndDate, active, createdAt, lastUpdated, otherParty)
+
             val flowHandle = proxy.startFlowDynamic(CreateAgreementFlow.Initiator::class.java, agreementNumber, agreementName, agreementStatus, agreementType, totalAgreementValue, otherParty)
 
             val result = flowHandle.use { it.returnValue.getOrThrow() }

@@ -4,14 +4,8 @@
 
         <title>Adappt Underwriting Dashboard</title>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.7.5/styles/salesforce-lightning-design-system.css" rel="stylesheet" type="text/css" />
-        <script>
-        var resourcePath = "{!URLFOR($Resource.lightning)}";
-        resourcePath = resourcePath + '/';
-        myApp.value('resourcePath', resourcePath);
-        </script>
 
         <style>
             .element-container{
@@ -61,6 +55,13 @@
             }
 
 
+             self.post = function(config){
+                       var _url = config.url ? config.url : (instanceConfig && instanceConfig.url ? instanceConfig.url : defaulsConfig.url);
+                var _data = config.data;
+
+                return  axios.post(_url,_data);
+            }
+
         }
 
         var httpInstance = new HTTPUtil();
@@ -87,6 +88,28 @@
 
     $scope.showTeikoku = false;
     $scope.showApplicationModal = false;
+    $scope.showApprove = false;
+    $scope.showReject = false;
+    $scope.showSideColumn = true;
+
+
+    $scope.showApproveFn = function(sendType,methodName){
+    $scope.showApprove = true;
+    lastSendType = sendType;
+    lastMethodName = methodName;
+
+        }
+
+
+
+    $scope.showRejectFn = function(sendType,methodName){
+    $scope.showReject = true;
+    lastSendType = sendType;
+    lastMethodName = methodName;
+
+        }
+
+
 
 
     $scope.showTeikokuFn = function(sendType,methodName){
@@ -116,6 +139,8 @@
     $scope.loadingApplications = false;
 
 
+
+
     $scope.hideApplicationModal  = function(){
          $scope.showApplicationModal = false;
     }
@@ -123,7 +148,17 @@
     $scope.hideTeikoku = function(){
         $scope.showTeikoku = false;
 
-        }
+    }
+
+    $scope.hideApprove = function(){
+        $scope.showApprove = false;
+
+    }
+
+        $scope.hideReject = function(){
+        $scope.showReject = false;
+
+    }
 
 
     $scope.getApplications = function(){
@@ -131,7 +166,7 @@
 
         var getApplicationsPromise = httpInstance.get(
             {
-                url: 'https://dapps.ngrok.io/api/getApplications',
+                url: 'https://dapps.ngrok.io/api/applications',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -157,7 +192,7 @@
 
         var getMePromise = httpInstance.get(
             {
-                url: 'https://dapps.ngrok.io/api/me',
+                url: 'https://dapps.ngrok.io/apime',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -175,27 +210,28 @@
 
             }
 
-      $scope.submitApplication = function() {
+      $scope.createApplication = function() {
 
        var reqObj = {};
         reqObj.applicationId=$scope.applicationId;
         reqObj.applicationName=$scope.applicationName;
         reqObj.industry=$scope.industry;
-        reqObj.applicationStatus=$scope.applicationStatus;
-        reqObj.partyName=$scope.partyName;
+        reqObj.applicationStatus=$scope.status;
+        reqObj.agent=$scope.agent;
+        reqObj.policyHolder=$scope.policyHolder;
         $scope.showTransferSpinner = true;
 
        var dataStr = JSON.stringify(reqObj);
 
-       var submitApplicationPromise = httpInstance.get(
+       var createApplicationPromise = httpInstance.post(
            {
-               url: 'https://dapps.ngrok.io/api/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.applicationStatus + '&partyName=' + $scope.partyName,
+               url: 'https://dapps.ngrok.io/api/dappscape/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&agent=' + $scope.agent + '&policyHolder=' + $scope.policyHolder,
                dataType: 'json',
                method: 'POST'
            }
 
            );
-              submitApplicationPromise.then(function (response) {
+              createApplicationPromise.then(function (response) {
                     console.log(response);
                     $scope.showTransferSpinner = false;
                     $scope.showMessage = "Success: "+ response;
@@ -207,45 +243,63 @@
             }
 
 
-                  // Create Agreement Function
-
-     $scope.createAgreement = function() {
+       $scope.approveApplication = function() {
 
        var reqObj = {};
-        reqObj.accountId=$scope.accountId;
-        reqObj.agreementNumber=$scope.agreementNumber;
-        reqObj.agreementName=$scope.agreementName;
-        reqObj.agreementType=$scope.agreementType;
-        reqObj.agreementStatus=$scope.agreementStatus;
-        reqObj.totalAgreementValue=$scope.totalAgreementValue;
-        reqObj.partyName=$scope.partyName;
-        $scope.showTransferSpinner = true;
+        reqObj.applicationId=$scope.applicationId;
 
        var dataStr = JSON.stringify(reqObj);
 
-       var createAgreementPromise = httpInstance.post(
+       var approveApplicationPromise = httpInstance.post(
            {
-               url: 'https://dapps.ngrok.io/api/createAgreement?agreementNumber=' + $scope.agreementNumber + '&agreementName=' + $scope.agreementName + '&agreementStatus=' + $scope.agreementStatus + '&agreementType=' + $scope.agreementType + '&totalAgreementValue=' + $scope.totalAgreementValue + '&partyName=' + $scope.partyName,
+               url: 'https://dapps.ngrok.io/api/approveApplication?applicationId=' + $scope.applicationId,
                dataType: 'json',
                method: 'POST'
            }
 
            );
-              createAgreementPromise.then(function (response) {
-                	console.log(response);
+              approveApplicationPromise.then(function (response) {
+                    console.log(response);
                     $scope.showTransferSpinner = false;
-					$scope.showMessage = "dsoa: "+ response.data;
+                    $scope.showMessage = "Success: Application Approved. "+ response;
                     $scope.$apply();
-                    $scope.showAlert = false;
                   }).catch(function (error) {
                     console.log(error);
                     });
 
-    		}
+            }
+
+
+              $scope.rejectApplication = function() {
+
+       var reqObj = {};
+        reqObj.applicationId=$scope.applicationId;
+
+       var dataStr = JSON.stringify(reqObj);
+
+       var rejectApplicationPromise = httpInstance.post(
+           {
+               url: 'https://dapps.ngrok.io/api/rejectApplication?applicationId=' + $scope.applicationId,
+               dataType: 'json',
+               method: 'POST'
+           }
+
+           );
+              rejectApplicationPromise.then(function (response) {
+                    console.log(response);
+                    $scope.showTransferSpinner = false;
+                    $scope.showMessage = "Success: Application Rejected. "+ response;
+                    $scope.$apply();
+                  }).catch(function (error) {
+                    console.log(error);
+                    });
+
+            }
 
 
      $scope.getApplications();
      $scope.getMe();
+
 
         }
 
@@ -259,38 +313,38 @@
     <body ng-controller="MyController">
 
 
-
     <div class="slds-page-header">
         <div class="slds-media">
             <div class="slds-media__figure">
+                <apex:image url="{!URLFOR($Resource.sumi)}" width="53px" height="53px"/>
             </div>
             <div class="slds-media__body">
-                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Insurance Dashboard</h1>
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Application Dashboard</h1>
                 <p class="slds-text-body_small slds-line-height_reset">
                     ID: {{me}}
                 </p>
             </div>
             <div class="slds-page-header__control">
-                <ul class="slds-button-group-list">
-                    <li>
+                <ul class="slds-button-group-row">
+                    <li class="slds-button-group-item">
                         <button class="slds-button slds-button_neutral" ng-click="showApplicationModalFn('Transfer')">Create Application</button>
                     </li>
-                    <li>
+                    <li class="slds-button-group-item">
                         <button class="slds-button slds-button_neutral" ng-click="showTeikokuFn('Transfer')">Teikoku Check</button>
                     </li>
-                    <li>
-                        <button class="slds-button slds-button_neutral" ng-click="">Approve</button>
+                    <li class="slds-button-group-item">
+                        <button class="slds-button slds-button_neutral" ng-click="showApproveFn('Transfer')">Approve</button>
                     </li>
-                    <li>
-                        <button class="slds-button slds-button_neutral" ng-click="">Reject</button>
+                    <li class="slds-button-group-item">
+                        <button class="slds-button slds-button_neutral" ng-click="showRejectFn('Transfer')">Reject</button>
                     </li>
-                    <li>
+                    <li class="slds-button-group-item">
                         <button class="slds-button slds-button_neutral" ng-click="">Upload File</button>
                     </li>
-                    <li>
+                    <li class="slds-button-group-item">
                         <button class="slds-button slds-button_neutral" ng-click="">Review</button>
                     </li>
-                    <li>
+                    <li class="slds-button-group-item">
                         <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
                             <button class="slds-button slds-button_icon slds-button_icon-border-filled" aria-haspopup="true" title="More Actions">
                                 <svg class="slds-button__icon" aria-hidden="true">
@@ -313,7 +367,7 @@
     </div>
 
     <div class="slds-grid slds-wrap">
-        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_2-of-12" style="padding-left:8px; padding-bottom:28px">
+        <div class="slds-col slds-size_0-of-1 slds-medium-size_6-of-12 slds-large-size_2-of-12" style="padding-left:8px; padding-bottom:28px">
 
             <div class="demo-only" style="width: 280px; background-color: rgb(250, 250, 251);">
                 <nav class="slds-nav-vertical" aria-label="Sub page">
@@ -372,16 +426,6 @@
                             <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">All Policies</a></li>
                         </ul>
                     </div>
-                    <div class="slds-nav-vertical__section">
-                        <h2 style="font-weight: bold" class="slds-nav-vertical__title">Claims</h2>
-                        <ul aria-describedby="entity-header">
-                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Recent</a></li>
-                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Created by Me</a></li>
-                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Submitted Claims</a></li>
-                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">Historical Claims</a></li>
-                            <li class="slds-nav-vertical__item"><a href="javascript:void(0);" class="slds-nav-vertical__action">All Claims</a></li>
-                        </ul>
-                    </div>
                 </nav>
             </div>
         </div>
@@ -411,7 +455,7 @@
                     <br/>
                     <br/>
                     <div class="list-container" >
-                        <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-table_fixed-layout slds-table_cell-buffer slds-table_striped" role="grid">
+                        <table class="slds-table slds-max-medium-table_stacked-horizontal slds-table_fixed-layout slds-table_cell-buffer" role="grid">
                             <thead>
                             <tr class="slds-text-title_caps">
                                 <th scope="col">
@@ -436,10 +480,10 @@
                             </thead>
                             <tbody>
                             <tr ng-repeat="application in applications">
-                                <td data-label="Name">
+                                <td data-label="Account">
                                     <div class="slds-truncate" title="{{application.name}}">{{application.accountId}}</div>
                                 </td>
-                                <td data-label="Type">
+                                <td data-label="Name">
                                     <div class="slds-truncate" title="{{application.type}}">{{application.applicationName}}</div>
                                 </td>
                                 <td data-label="Id">
@@ -448,7 +492,7 @@
                                 <td data-label="Industry">
                                     <div class="slds-truncate" title="{{application.industry}">{{application.industry}}</div>
                                 </td>
-                                <td data-label="Phone">
+                                <td data-label="Status">
                                     <div class="slds-truncate" title="{{application.phone}">{{application.applicationStatus}}</div>
                                 </td>
                                 <td data-label="Agent">
@@ -489,7 +533,7 @@
                     </span>
                             </td>
                             <td>
-                                <h2 id="modal-heading-01" style="padding-left:17px" class="slds-text-heading_small slds-hyphenate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Application</h2>
+                                <h2 style="padding-left:17px" class="slds-text-heading_small slds-hyphenate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Application</h2>
                                 <p class="slds-text-body_small slds-line-height_reset" style="padding-left:17px">
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a New Application
                                 </p>
@@ -500,6 +544,10 @@
                 </header>
                 <form style="padding-left:8px; padding-right:8px; padding-top:28px; padding-bottom:28px" class="slds-card slds-form--stacked">
                     <div class="slds-form-element">
+                        <label class="slds-form-element__label">Account ID / アカウントID:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="accountId" />
+                    </div>
+                    <div class="slds-form-element">
                         <label class="slds-form-element__label">Application Name: / アプリケーション名:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationName" />
                     </div>
@@ -507,6 +555,11 @@
                     <div class="slds-form-element">
                         <label class="slds-form-element__label">Application Number / アプリケーションID:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationId" />
+                    </div>
+
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Company / 会社名:</label>
+                        <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="companyName" />
                     </div>
 
                     <div class="slds-form-element">
@@ -525,7 +578,7 @@
                         </div>
                     </div>
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Applicant / ポリシー保有者:</label>
+                        <label class="slds-form-element__label">Provider / ポリシー保有者:</label>
                         <input type="text" name="company" class="slds-input slds-combobox__input" ng-model="partyName" />
                     </div>
 
@@ -541,6 +594,287 @@
         </section>
         <div class="slds-backdrop slds-backdrop_open"></div>
     </div>
+
+
+
+    <!--Approver Modal-->
+    <div class="demo-only" style="min-height:640px;margin-top: 0px !important;" ng-show="showApprove">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideApprove()">
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                        </svg>
+                        <span class="slds-assistive-text" >Close</span>
+                    </button>
+                    <table>
+                        <tr>
+                            <td style="max-width: 17px;">
+                                <span class="slds-icon_container slds-icon-custom-custom5" title="Description of icon when needed">
+                                    <svg class="slds-icon slds-icon_large" aria-hidden="true">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/custom-sprite/svg/symbols.svg#custom18"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text">Description of icon</span>
+                                </span>
+                            </td>
+                            <td>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Approve Insurance Policy</h2>
+                                <p class="slds-text-body_small slds-line-height_reset">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sign the policy as approved and begin next steps to close the Opportunity.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="min-height: 300px;">
+                    <ngl-lookup options="accountOptions" config="accountLookupConfig" selectedmodel="selectedAccount" loading="loadingAccount" ></ngl-lookup><br/>
+
+                    <fieldset class="slds-form-element" style="border: 1px solid #ebf3fb;padding: 8px;">
+                        <legend class="slds-form-element__legend slds-legend slds-form-element__label">Application Details</legend>
+                        <label class="slds-form-element__label" >Value</label>
+                        <table><tr>
+                            <td>
+                                <div class="slds-form-element__control">
+                                    <input type="text" id="SignerValue" class="slds-textarea" ng-model="signerValue" placeholder="Value"></input>
+                                </div>
+                            </td>
+                            <td style="min-width: 5px;"></td>
+                            <td>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-radio_button-group">
+
+                                    <span class="slds-button slds-radio_button">
+                                        <input type="radio" name="signerUnit" checked="checked" selected="selected" id="signerUnitEther" ng-model="signerUnit" value="E"/>
+                                        <label class="slds-radio_button__label" for="signerUnitEther">
+                                            <span class="slds-radio_faux">USD</span>
+                                        </label>
+                                    </span>
+                                        <span class="slds-button slds-radio_button">
+                                        <input type="radio" name="signerUnit" id="signerUnitWei" ng-model="signerUnit"  value="W"/>
+                                        <label class="slds-radio_button__label" for="signerUnitWei">
+                                            <span class="slds-radio_faux">YEN</span>
+                                        </label>
+                                    </span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr></table>
+
+                        <label class="slds-form-element__label">Policy Number</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" class="slds-textarea" ng-model="applicationId" placeholder="" size="10" />
+                        </div>
+                        <label class="slds-form-element__label">Account Id</label>
+                        <div class="slds-form-element__control">
+                            <input type="text"  class="slds-textarea" ng-model="accountId" placeholder=""></input>
+                        </div>
+                    </fieldset>
+                    <fieldset class="slds-form-element">
+                        <legend class="slds-form-element__legend slds-form-element__label">Sign using:</legend>
+                        <div class="slds-form-element__control">
+                            <div class="slds-radio_button-group">
+                                <span class="slds-button slds-radio_button">
+                                    <input type="radio" name="radio" id="tuesday" ng-model="signUsingOption" ng-click="onChangeSignOption()" value="E"/>
+                                    <label class="slds-radio_button__label" for="tuesday">
+                                        <span class="slds-radio_faux">Administrator Password</span>
+                                    </label>
+                                </span>
+                                <span class="slds-button slds-radio_button">
+                                    <input type="radio" name="radio" id="wednesday" ng-model="signUsingOption" ng-click="onChangeSignOption()" value="P"/>
+                                    <label class="slds-radio_button__label" for="wednesday">
+                                        <span class="slds-radio_faux">Private Key</span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br/>
+
+                    <div class="slds-form-element" ng-show="signUsingOption=='E'">
+                        <label class="slds-form-element__label" for="text-input-id-1">Admin Password</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                            <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                            </svg>
+                            <input type="password" ng-model="ethereumPassword" id="text-input-id-1" class="slds-input" placeholder="Enter Password"/>
+                        </div>
+                    </div>
+
+
+
+                    <div class="slds-form-element" ng-show="signUsingOption=='P'">
+                        <label class="slds-form-element__label" for="text-input-id-1">Private Key</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                            <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                            </svg>
+                            <input type="password" ng-model="privateKey" class="slds-input" placeholder="Enter Private Key"/>
+                        </div>
+                    </div>
+
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" ng-click="hideAlert()">Cancel</button>
+                    <button class="slds-button slds-button_brand" ng-click="approveApplication()">
+                        <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#lock"></use>
+                        </svg>Approve Policy</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+
+
+
+
+
+    <!--Reject Modal-->
+    <div class="demo-only" style="min-height:640px;margin-top: 0px !important;" ng-show="showReject">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideReject()">
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                        </svg>
+                        <span class="slds-assistive-text" >Close</span>
+                    </button>
+                    <table>
+                        <tr>
+                            <td style="max-width: 17px;">
+                                <span class="slds-icon_container slds-icon-custom-custom5" title="Description of icon when needed">
+                                    <svg class="slds-icon slds-icon_large" aria-hidden="true">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/custom-sprite/svg/symbols.svg#custom18"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text">Description of icon</span>
+                                </span>
+                            </td>
+                            <td>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reject Insurance Policy</h2>
+                                <p class="slds-text-body_small slds-line-height_reset">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sign the policy as Rejected and notify the client.
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" style="min-height: 300px;">
+                    <ngl-lookup options="accountOptions" config="accountLookupConfig" selectedmodel="selectedAccount" loading="loadingAccount" ></ngl-lookup><br/>
+
+                    <fieldset class="slds-form-element" style="border: 1px solid #ebf3fb;padding: 8px;">
+                        <legend class="slds-form-element__legend slds-legend slds-form-element__label">Application Details</legend>
+                        <label class="slds-form-element__label" >Value</label>
+                        <table><tr>
+                            <td>
+                                <div class="slds-form-element__control">
+                                    <input type="text" id="SignerValue" class="slds-textarea" ng-model="signerValue" placeholder="Value"></input>
+                                </div>
+                            </td>
+                            <td style="min-width: 5px;"></td>
+                            <td>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-radio_button-group">
+
+                                    <span class="slds-button slds-radio_button">
+                                        <input type="radio" name="signerUnit" checked="checked" selected="selected" ng-model="signerUnit" value="E"/>
+                                        <label class="slds-radio_button__label" for="signerUnitEther">
+                                            <span class="slds-radio_faux">USD</span>
+                                        </label>
+                                    </span>
+                                        <span class="slds-button slds-radio_button">
+                                        <input type="radio" name="signerUnit" ng-model="signerUnit"  value="W"/>
+                                        <label class="slds-radio_button__label" for="signerUnitWei">
+                                            <span class="slds-radio_faux">YEN</span>
+                                        </label>
+                                    </span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr></table>
+
+                        <label class="slds-form-element__label" >Policy Number</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" class="slds-textarea" ng-model="applicationId" placeholder="" size="10" />
+                        </div>
+                        <label class="slds-form-element__label" >Account Id</label>
+                        <div class="slds-form-element__control">
+                            <input type="text"  class="slds-textarea" ng-model="accountId" placeholder=""></input>
+                        </div>
+                    </fieldset>
+                    <fieldset class="slds-form-element">
+                        <legend class="slds-form-element__legend slds-form-element__label">Sign using:</legend>
+                        <div class="slds-form-element__control">
+                            <div class="slds-radio_button-group">
+                                <span class="slds-button slds-radio_button">
+                                    <input type="radio" name="radio" ng-model="signUsingOption" ng-click="onChangeSignOption()" value="E"/>
+                                    <label class="slds-radio_button__label" for="tuesday">
+                                        <span class="slds-radio_faux">Administrator Password</span>
+                                    </label>
+                                </span>
+                                <span class="slds-button slds-radio_button">
+                                    <input type="radio" name="radio" ng-model="signUsingOption" ng-click="onChangeSignOption()" value="P"/>
+                                    <label class="slds-radio_button__label" for="wednesday">
+                                        <span class="slds-radio_faux">Private Key</span>
+                                    </label>
+                                </span>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <br/>
+
+                    <div class="slds-form-element" ng-show="signUsingOption=='E'">
+                        <label class="slds-form-element__label" for="text-input-id-1">Admin Password</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                            <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                            </svg>
+                            <input type="password" ng-model="ethereumPassword" class="slds-input" placeholder="Enter Password"/>
+                        </div>
+                    </div>
+
+
+
+                    <div class="slds-form-element" ng-show="signUsingOption=='P'">
+                        <label class="slds-form-element__label" for="text-input-id-1">Private Key</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                            <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                            </svg>
+                            <input type="password" ng-model="privateKey" class="slds-input" placeholder="Enter Private Key"/>
+                        </div>
+                    </div>
+
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" ng-click="hideAlert()">Cancel</button>
+                    <button class="slds-button slds-button_brand" ng-click="approveApplication()">
+                        <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#lock"></use>
+                        </svg>Reject Policy</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+
+
+
+
+
+    <div style="height: 180px;">
+        <div class="slds-docked-form-footer">
+
+        </div>
+    </div>
+
 
 
 

@@ -19,13 +19,6 @@ package io.adappt.policy
 import net.corda.core.serialization.CordaSerializable
 import java.util.*
 
-/**
- * @param sex male, female or intersex
- * @param age in years
- * @param height in centimeters
- * @param weight in kilograms
- * @param heartRate average rate in beats per minute
- */
 @CordaSerializable
 data class Teikoku(val TeikokuCompanyCode: String,
                    val CompanyName: String,

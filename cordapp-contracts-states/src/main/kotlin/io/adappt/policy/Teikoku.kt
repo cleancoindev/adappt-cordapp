@@ -16,8 +16,18 @@
 
 package io.adappt.policy
 
+import it.oraclize.cordapi.entities.Answer
+import net.corda.core.contracts.Contract
+import net.corda.core.contracts.requireThat
 import net.corda.core.serialization.CordaSerializable
+import net.corda.core.transactions.LedgerTransaction
 import java.util.*
+
+
+// *****************
+// * Teikoku State *
+// *****************
+
 
 @CordaSerializable
 data class Teikoku(val TeikokuCompanyCode: String,
@@ -30,7 +40,6 @@ data class Teikoku(val TeikokuCompanyCode: String,
                    val Domain: String,
                    val DateOfEstablishment: Date,
                    val DateOfIncorporation: Date,
-                 //  val OperatingRecords: OperatingRecords,
                    val PaidInCapital: String,
                    val NumberOfEmployees: String,
                    val HoldingCompanyName: String,
@@ -56,3 +65,24 @@ data class Teikoku(val TeikokuCompanyCode: String,
                    val ReportDate: Date,
                    val UpdateDate: Date,
                    val SalesRanking: String)
+
+
+
+// **********************
+// * Teikoku Contract *
+// **********************
+
+
+class TeikokuContract : Contract {
+    companion object {
+        val TEIKOKU_CONTRACT_ID = TeikokuContract::class.java.canonicalName
+    }
+
+
+    override fun verify(tx: LedgerTransaction)  = requireThat {
+
+        val answ = tx.commandsOfType<Answer>().single().value
+
+
+    }
+}

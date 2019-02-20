@@ -52,6 +52,7 @@ sourceSets {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "com.github.oraclize:corda-api:win32_x86_64-SNAPSHOT"
 
     // Corda integration dependencies
     cordaCompile "$corda_release_group:corda-core:$corda_release_version"
@@ -72,6 +73,7 @@ dependencies {
         exclude group: "bouncycastle"
     }
     compile "io.reactivex:rxjava:1.2.4"
+
 
     // CorDapp dependencies.
     cordapp project(":cordapp")

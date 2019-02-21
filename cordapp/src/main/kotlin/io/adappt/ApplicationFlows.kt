@@ -202,3 +202,55 @@ class RejectApplicationFlow(val applicationId: String) : FlowLogic<SignedTransac
         return subFlow(FinalityFlow(stx))
     }
 }
+
+
+
+
+// ****************
+// * Review Application Flow *
+// ****************
+
+
+
+@InitiatingFlow
+@StartableByRPC
+class ReviewApplicationFlow(val applicationId: String): FlowLogic<SignedTransaction>() {
+
+    override val progressTracker = ProgressTracker()
+
+    @Suspendable
+    override fun call(): SignedTransaction {
+
+        val applicationStateAndRef = serviceHub.vaultService.queryBy<Application>().states.find {
+            it.state.data.applicationId == applicationId
+        } ?: throw IllegalArgumentException("No agreement with ID $applicationId found.")
+
+
+        val application = applicationStateAndRef.state.data
+        val applicationStatus = ApplicationStatus.INREVIEW
+
+        // Creating the output.
+        val reviewedApplication = Application(
+                application.applicationId,
+                application.applicationName,
+                application.industry,
+                applicationStatus,
+                application.agent,
+                application.provider,
+                application.linearId)
+
+        // Building the transaction.
+        val notary = applicationStateAndRef.state.notary
+        val txBuilder = TransactionBuilder(notary)
+        txBuilder.addInputState(applicationStateAndRef)
+        txBuilder.addOutputState(reviewedApplication, ApplicationContract.APPLICATION_CONTRACT_ID)
+        txBuilder.addCommand(ApplicationContract.Commands.RejectApplication(), ourIdentity.owningKey)
+        txBuilder.verify(serviceHub)
+
+        val stx = serviceHub.signInitialTransaction(txBuilder)
+        return subFlow(FinalityFlow(stx))
+    }
+}
+
+
+

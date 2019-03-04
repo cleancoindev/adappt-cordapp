@@ -176,7 +176,7 @@
 
         var getApplicationsPromise = httpInstance.get(
             {
-                url: 'http://localhost:10050/api/applications',
+                url: 'http://localhost:10050/api/getApplications',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -694,32 +694,32 @@
                 </header>
                 <form style="padding-left:8px; padding-right:8px; padding-top:28px; padding-bottom:28px" class="slds-card slds-form--stacked">
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Account ID / アカウントID:</label>
+                        <label class="slds-form-element__label">Account ID:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="accountId" />
                     </div>
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Application Name: / アプリケーション名:</label>
+                        <label class="slds-form-element__label">Application Name:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationName" />
                     </div>
 
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Application Number / アプリケーションID:</label>
+                        <label class="slds-form-element__label">Application Number:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="applicationId" />
                     </div>
 
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Company / 会社名:</label>
+                        <label class="slds-form-element__label">Company:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="companyName" />
                     </div>
 
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Industry / 業界:</label>
+                        <label class="slds-form-element__label">Industry:</label>
                         <input type="text" name="firstName" class="slds-input slds-combobox__input" ng-model="industry" />
                     </div>
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Status / アプリケーションの状態:</label>
+                        <label class="slds-form-element__label">Status:</label>
                         <div class="slds-select_container">
-                            <select name="gender" class="slds-select" ng-model="applicationStatus" >
+                            <select name="gender" class="slds-select" ng-model="status" >
                                 <option value="NEW">New</option>
                                 <option value="REQUESTED">Request</option>
                                 <option value="STARTED">Started</option>
@@ -728,15 +728,15 @@
                         </div>
                     </div>
                     <div class="slds-form-element">
-                        <label class="slds-form-element__label">Provider / ポリシー保有者:</label>
-                        <input type="text" name="company" class="slds-input slds-combobox__input" ng-model="partyName" />
+                        <label class="slds-form-element__label">Provider:</label>
+                        <input type="text" name="company" class="slds-input slds-combobox__input" ng-model="policyHolder" />
                     </div>
 
                 </form>
 
                 <footer class="slds-modal__footer">
                     <br/>
-                    <button  class="slds-button slds-button--brand" ng-click="submitApplication()">Submit / アプリケーションを提出する</button>
+                    <button  class="slds-button slds-button--brand" ng-click="createApplication()">Submit</button>
                     <img src="https://i.stack.imgur.com/pK4a5.gif" style="width:30px;" ng-show="showTransferSpinner"/>
                     {{showMessage}}
                 </footer>

@@ -72,7 +72,7 @@ class TeikokuFlow : FlowLogic<SignedTransaction>() {
 
         val builder = TransactionBuilder(notary)
         builder.addCommand(Command(answer, listOf(oracle.owningKey, ourIdentity.owningKey)))
-        builder.addOutputState(Teikoku(TeikokuCompanyCode, ourIdentity), TeikokuContract.TEIKOKU_CONTRACT_ID)
+        //builder.addOutputState(Teikoku( ourIdentity), TeikokuContract.TEIKOKU_CONTRACT_ID)
 
         builder.verify(serviceHub)
 

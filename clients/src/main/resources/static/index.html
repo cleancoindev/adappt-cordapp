@@ -5,7 +5,7 @@
         <title>Adappt Underwriting Dashboard</title>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.7.5/styles/salesforce-lightning-design-system.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="/assets/styles/salesforce-lightning-design-system.css" />
 
         <style>
             .element-container{
@@ -22,6 +22,16 @@
                 max-height: 375px;
                 overflow: auto;
              }
+             .slds-context-bar {
+                display: -ms-flexbox;
+                display: flex;
+                height: 2.5rem;
+                background-color: white;
+                border-bottom: #DA1A21;
+                color: #080707;
+                position: relative;
+                padding: 0 0 0 1.5rem;
+            }
 
             </style>
 
@@ -29,7 +39,7 @@
         <script>
 
 
-    var NODE_URL = 'https://dapps.ngrok.io/api/';
+    var NODE_URL = 'http://localhost:10050/api/';
     console.log(NODE_URL);
 
 
@@ -166,7 +176,7 @@
 
         var getApplicationsPromise = httpInstance.get(
             {
-                url: 'https://dapps.ngrok.io/api/applications',
+                url: 'http://localhost:10050/api/applications',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -189,10 +199,9 @@
 
       $scope.getMe = function(){
 	  $scope.loadingMe = true;
-
         var getMePromise = httpInstance.get(
             {
-                url: 'https://dapps.ngrok.io/apime',
+                url: 'http://localhost:10050/api/me',
                 dataType: 'json',
                 method: 'GET'
             }
@@ -200,7 +209,7 @@
             );
                 getMePromise.then(function (response) {
                     console.log(response);
-                    $scope.me = response.data.me;
+                    $scope.me = response.data;
                     $scope.loadingMe = false;
                     $scope.$apply();
 
@@ -225,7 +234,7 @@
 
        var createApplicationPromise = httpInstance.post(
            {
-               url: 'https://dapps.ngrok.io/api/dappscape/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&agent=' + $scope.agent + '&policyHolder=' + $scope.policyHolder,
+               url: 'http://localhost:10050/api/createApplication?applicationId=' + $scope.applicationId + '&applicationName=' + $scope.applicationName + '&industry=' + $scope.industry + '&applicationStatus=' + $scope.status + '&agent=' + $scope.agent + '&policyHolder=' + $scope.policyHolder,
                dataType: 'json',
                method: 'POST'
            }
@@ -252,7 +261,7 @@
 
        var approveApplicationPromise = httpInstance.post(
            {
-               url: 'https://dapps.ngrok.io/api/approveApplication?applicationId=' + $scope.applicationId,
+               url: 'http://localhost:10050/api/approveApplication?applicationId=' + $scope.applicationId,
                dataType: 'json',
                method: 'POST'
            }
@@ -279,7 +288,7 @@
 
        var rejectApplicationPromise = httpInstance.post(
            {
-               url: 'https://dapps.ngrok.io/api/rejectApplication?applicationId=' + $scope.applicationId,
+               url: 'http://localhost:10050/api/rejectApplication?applicationId=' + $scope.applicationId,
                dataType: 'json',
                method: 'POST'
            }
@@ -311,12 +320,153 @@
 
     </head>
     <body ng-controller="MyController">
+        <header class="slds-global-header_container">
+            <div class="slds-global-header slds-grid slds-grid_align-spread">
+                <div class="slds-global-header__item">
+                    <div>
 
+                    </div>
+                </div>
+                <div class="slds-global-header__item slds-global-header__item_search">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="combobox-id-1"></label>
+                        <div class="slds-form-element__control">
+                            <div class="slds-combobox_container">
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                                    <div style="width:500px" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                        <input type="text" class="slds-input slds-combobox__input" style="color: #061C3F" id="combobox-id-1" aria-autocomplete="list" aria-controls="listbox-id-1" autocomplete="off" role="textbox" placeholder="" />
+                                        <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+              <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search" />
+              </svg>
+            </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-global-header__item">
+                    <ul class="slds-global-actions">
+                        <li class="slds-global-actions__item">
+                            <div class="slds-global-actions__favorites slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <div class="slds-button-group">
+
+                                </div>
+                            </div>
+                        </li>
+                        <li class="slds-global-actions__item">
+                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__task slds-global-actions__item-action" aria-haspopup="true" title="Global Actions">
+                                    <svg class="slds-button__icon" aria-hidden="true">
+                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#add"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text">Global Actions</span>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="slds-global-actions__item">
+                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__help slds-global-actions__item-action" aria-haspopup="true" title="Help and Training">
+                                    <span class="slds-assistive-text">Help and Training</span>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="slds-global-actions__item">
+                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__setup slds-global-actions__item-action" aria-haspopup="true" title="Setup">
+                                    <span class="slds-assistive-text">Setup</span>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="slds-global-actions__item">
+                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <button class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__notifications slds-global-actions__item-action" title="no new notifications" aria-live="assertive" aria-atomic="true">
+                                    <svg class="slds-button__icon slds-global-header__icon" aria-hidden="true">
+                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#notification"></use>
+                                    </svg>
+                                    <span class="slds-assistive-text">no new notifications</span>
+                                </button>
+                                <span aria-hidden="true" class="slds-notification-badge">0</span>
+                            </div>
+                        </li>
+                        <li class="slds-global-actions__item">
+                            <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
+                                <button class="slds-button slds-global-actions__avatar slds-global-actions__item-action" title="person name" aria-haspopup="true">
+              <span class="slds-avatar slds-avatar_circle slds-avatar_medium">
+                <img alt="Person name" src="/assets/images/avatar1.jpg" title="User avatar" />
+              </span>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <br/>
+        <br/>
+        <br/>
+
+        <div class="slds-context-bar">
+            <div class="slds-context-bar__primary">
+                <div class="slds-context-bar__item slds-context-bar__dropdown-trigger slds-dropdown-trigger slds-dropdown-trigger_click slds-no-hover">
+                    <div class="slds-context-bar__icon-action">
+                        <button class="slds-button slds-icon-waffle_container slds-context-bar__button" title="Description of the icon when needed">
+                                <span class="slds-icon-waffle">
+                                    <span class="slds-r1"></span>
+                                    <span class="slds-r2"></span>
+                                    <span class="slds-r3"></span>
+                                    <span class="slds-r4"></span>
+                                    <span class="slds-r5"></span>
+                                    <span class="slds-r6"></span>
+                                    <span class="slds-r7"></span>
+                                    <span class="slds-r8"></span>
+                                    <span class="slds-r9"></span>
+                                </span>
+                            <span class="slds-assistive-text">Open App Launcher</span>
+                        </button>
+                    </div>
+                    <span class="slds-context-bar__label-action slds-context-bar__app-name">
+          <span class="slds-truncate" title="App Name">Adappt</span>
+        </span>
+                </div>
+            </div>
+            <nav class="slds-context-bar__secondary" role="navigation">
+                <ul class="slds-grid">
+                    <li class="slds-context-bar__item">
+                        <a href="/index.html" class="slds-context-bar__label-action" title="Home">
+                            <span class="slds-assistive-text">Current Page:</span>
+                            <span class="slds-truncate" title="Home">Home</span>
+                        </a>
+                    </li>
+                    <li class="slds-context-bar__item">
+                        <a href="/camila.html" class="slds-context-bar__label-action" title="Menu Item">
+                            <span class="slds-truncate" title="Camila">Camila</span>
+                        </a>
+                    </li>
+                    <li class="slds-context-bar__item">
+                        <a href="/agreement.html" class="slds-context-bar__label-action" title="Menu Item">
+                            <span class="slds-truncate" title="Agreements">Agreements</span>
+                        </a>
+                    </li>
+                    <li class="slds-context-bar__item">
+                        <a href="/networkmap.html" class="slds-context-bar__label-action" title="Menu Item">
+                            <span class="slds-truncate" title="Network Map">Network Map</span>
+                        </a>
+                    </li>
+                    <li class="slds-context-bar__item">
+                        <a href="/invoices.html" class="slds-context-bar__label-action" title="Menu Item">
+                            <span class="slds-truncate" title="Invoices">Invoices</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
     <div class="slds-page-header">
         <div class="slds-media">
             <div class="slds-media__figure">
-                <apex:image url="{!URLFOR($Resource.sumi)}" width="53px" height="53px"/>
             </div>
             <div class="slds-media__body">
                 <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="IOU Dashboard">Application Dashboard</h1>
@@ -348,7 +498,7 @@
                         <div class="slds-dropdown-trigger slds-dropdown-trigger_click">
                             <button class="slds-button slds-button_icon slds-button_icon-border-filled" aria-haspopup="true" title="More Actions">
                                 <svg class="slds-button__icon" aria-hidden="true">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#down" />
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down" />
                                 </svg>
                                 <span class="slds-assistive-text">More Actions</span>
                             </button>
@@ -377,7 +527,7 @@
                         <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
         <span class="slds-icon_container slds-icon-utility-search">
           <svg class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" aria-hidden="true">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#search" />
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search" />
           </svg>
         </span>
                             <input type="search" id="input-id-01" placeholder="Quick Find" class="slds-input" value="" />
@@ -406,7 +556,7 @@
                                             <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
           <span class="slds-file-selector__button slds-button slds-button_neutral">
             <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#upload" />
+              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#upload" />
             </svg>Upload Files</span>
                                                 <span class="slds-file-selector__text slds-medium-show">or Drop Files</span>
                                             </label>
@@ -440,7 +590,7 @@
                                 <div class="slds-media__figure">
                                     <div class="slds-icon_container slds-icon-standard-lead">
                                         <svg class="slds-icon" aria-hidden="true">
-                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
+                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
                                         </svg>
                                         <span class="slds-assistive-text">My Applications</span>
                                     </div>
@@ -518,7 +668,7 @@
                 <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideApplicationModal()">
                         <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
                         </svg>
                         <span class="slds-assistive-text" >Close</span>
                     </button>
@@ -527,7 +677,7 @@
                             <td style="max-width: 17px;">
                     <span class="slds-icon_container slds-icon-custom-custom5" title="Description of icon when needed">
                       <svg class="slds-icon slds-icon_large" aria-hidden="true">
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/action-sprite/svg/symbols.svg#new_account"></use>
                       </svg>
                       <span class="slds-assistive-text">Description of icon</span>
                     </span>
@@ -604,7 +754,7 @@
                 <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideApprove()">
                         <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
                         </svg>
                         <span class="slds-assistive-text" >Close</span>
                     </button>
@@ -613,7 +763,7 @@
                             <td style="max-width: 17px;">
                                 <span class="slds-icon_container slds-icon-custom-custom5" title="Description of icon when needed">
                                     <svg class="slds-icon slds-icon_large" aria-hidden="true">
-                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/custom-sprite/svg/symbols.svg#custom18"></use>
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/custom-sprite/svg/symbols.svg#custom18"></use>
                                     </svg>
                                     <span class="slds-assistive-text">Description of icon</span>
                                 </span>
@@ -697,7 +847,7 @@
                         <label class="slds-form-element__label" for="text-input-id-1">Admin Password</label>
                         <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
                             <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
                             </svg>
                             <input type="password" ng-model="ethereumPassword" id="text-input-id-1" class="slds-input" placeholder="Enter Password"/>
                         </div>
@@ -709,7 +859,7 @@
                         <label class="slds-form-element__label" for="text-input-id-1">Private Key</label>
                         <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
                             <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
                             </svg>
                             <input type="password" ng-model="privateKey" class="slds-input" placeholder="Enter Private Key"/>
                         </div>
@@ -721,7 +871,7 @@
                     <button class="slds-button slds-button_neutral" ng-click="hideAlert()">Cancel</button>
                     <button class="slds-button slds-button_brand" ng-click="approveApplication()">
                         <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#lock"></use>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#lock"></use>
                         </svg>Approve Policy</button>
                 </footer>
             </div>
@@ -740,7 +890,7 @@
                 <header class="slds-modal__header">
                     <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideReject()">
                         <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
                         </svg>
                         <span class="slds-assistive-text" >Close</span>
                     </button>
@@ -749,7 +899,7 @@
                             <td style="max-width: 17px;">
                                 <span class="slds-icon_container slds-icon-custom-custom5" title="Description of icon when needed">
                                     <svg class="slds-icon slds-icon_large" aria-hidden="true">
-                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/custom-sprite/svg/symbols.svg#custom18"></use>
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/custom-sprite/svg/symbols.svg#custom18"></use>
                                     </svg>
                                     <span class="slds-assistive-text">Description of icon</span>
                                 </span>
@@ -833,7 +983,7 @@
                         <label class="slds-form-element__label" for="text-input-id-1">Admin Password</label>
                         <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
                             <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
                             </svg>
                             <input type="password" ng-model="ethereumPassword" class="slds-input" placeholder="Enter Password"/>
                         </div>
@@ -845,7 +995,7 @@
                         <label class="slds-form-element__label" for="text-input-id-1">Private Key</label>
                         <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
                             <svg class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" aria-hidden="true">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/action-sprite/svg/symbols.svg#password_unlock"></use>
                             </svg>
                             <input type="password" ng-model="privateKey" class="slds-input" placeholder="Enter Private Key"/>
                         </div>
@@ -857,7 +1007,7 @@
                     <button class="slds-button slds-button_neutral" ng-click="hideAlert()">Cancel</button>
                     <button class="slds-button slds-button_brand" ng-click="approveApplication()">
                         <svg class="slds-button__icon slds-button__icon_left" aria-hidden="true">
-                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.lightning)}/assets/icons/utility-sprite/svg/symbols.svg#lock"></use>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#lock"></use>
                         </svg>Reject Policy</button>
                 </footer>
             </div>
@@ -865,6 +1015,118 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </div>
 
+        <!--Teikoku Modal -->
+        <div class="demo-only" style="min-height:640px;margin-top: 0px !important;" ng-show="showTeikoku">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" ng-click="hideTeikoku()">
+                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                            </svg>
+                            <span class="slds-assistive-text" >Close</span>
+                        </button>
+                        <table>
+                            <tr>
+                                <td style="max-width: 17px;">
+                    <span class="slds-icon_container slds-icon-custom-custom103" title="Description of icon when needed">
+                      <svg class="slds-icon slds-icon_large" aria-hidden="true">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#database"></use>
+                      </svg>
+                      <span class="slds-assistive-text">Description of icon</span>
+                    </span>
+                                </td>
+                                <td>
+                                    <h2 id="modal-heading-01" style="padding-left:17px" class="slds-text-heading_small slds-hyphenate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Teikoku Database</h2>
+                                    <p class="slds-text-body_small slds-line-height_reset" style="padding-left:17px">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Teikoku Database
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </header>
+                    <form style="padding-left:8px; padding-right:8px; padding-top:28px; padding-bottom:28px" class="slds-card" name="account wizard">
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12" style="padding-top:28px">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Teikoku Company Code: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" value="{{teikoku.companyCode}}" />
+                                </div>
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Company Name: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="accountName" />
+                                </div>
+
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Postal Code: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="accountType" />
+                                </div>
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Company Address: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="phone" />
+                                </div>
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Telephone Address: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="industry" />
+                                </div>
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Teikoku Industrial Classification:</label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="owner" />
+                                </div>
+
+                                <br/>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_6-of-12" style="padding-top:28px;padding-left:8px">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Date of Incoporation: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" value="{{teikoku.companyCode}}" />
+                                </div>
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Number of Employees: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="accountName" />
+                                </div>
+
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Number of Shareholders: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="accountType" />
+                                </div>
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Trading Bank: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="phone" />
+                                </div>
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Chief Executive Name: </label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="industry" />
+                                </div>
+
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="inputSample2">Credit Scoring:</label>
+                                    <input type="text" name="firstName" class="slds-input slds-combobox__input" readonly="true" ng-model="owner" />
+                                </div>
+
+                                <br/>
+                            </div>
+                        </div>
+                    </form>
+
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" ng-click="hideAccount()">Cancel</button>
+                        <button  class="slds-button slds-button--brand" ng-click="createAccount()">Refresh Teikoku Databank</button>
+                        <img src="https://i.stack.imgur.com/pK4a5.gif" style="width:30px;" ng-show="showTransferSpinner"/>
+                        {{showMessage}}
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
 
 
 

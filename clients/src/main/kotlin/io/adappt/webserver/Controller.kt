@@ -206,7 +206,7 @@ class RestController(
     }
 
 
-    @PostMapping(value = "/activateAgreement", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=applcation/x-www-form-urlencoded"))
+    @PostMapping(value = "/activateAgreement")
     fun activateAgreement(@RequestParam("agreementNumber") agreementNumber: String, request: HttpServletRequest): ResponseEntity<String> {
         val agreementNumber = request.getParameter("agreementNumber")
         val flow = rpc.proxy.startFlowDynamic(ActivateAgreementFlow::class.java, agreementNumber)
@@ -219,7 +219,7 @@ class RestController(
         }
     }
 
-    @PostMapping(value = "/terminateAgreement", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    @PostMapping(value = "/terminateAgreement")
     fun terminateAgreement(@RequestParam("agreementNumber") agreementNumber: String, request: HttpServletRequest): ResponseEntity<String> {
         val agreementNumber = request.getParameter("agreementNumber")
         val flow = rpc.proxy.startFlowDynamic(TerminateAgreementFlow::class.java, agreementNumber)
@@ -232,7 +232,7 @@ class RestController(
         }
     }
 
-    @PostMapping(value = "/renewAgreement", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    @PostMapping(value = "/renewAgreement")
     fun renweAgreement(@RequestParam("agreementNumber") agreementNumber: String, request: HttpServletRequest): ResponseEntity<String> {
         val agreementNumber = request.getParameter("agreementNumber")
         val flow = rpc.proxy.startFlowDynamic(RenewAgreementFlow::class.java, agreementNumber)
@@ -246,7 +246,7 @@ class RestController(
     }
 
 
-    @PostMapping(value = "/amendAgreement", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=application/x-www-form-urlencoded"))
+    @PostMapping(value = "/amendAgreement")
     fun amendAgreement(@RequestParam("agreementNumber") agreementNumber: String, request: HttpServletRequest): ResponseEntity<String> {
         val agreementNumber = request.getParameter("agreementNumber")
         val flow = rpc.proxy.startFlowDynamic(AmendAgreementFlow::class.java, agreementNumber)
@@ -295,7 +295,7 @@ class RestController(
     }
 
 
-    @PostMapping(value = "/approveApplication", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=applcation/x-www-form-urlencoded"))
+    @PostMapping(value = "/approveApplication")
     fun approveApplication(@RequestParam("applicationId") applicationId: String, request: HttpServletRequest): ResponseEntity<String> {
         val applicationId = request.getParameter("applicationId")
         val flow = rpc.proxy.startFlowDynamic(ApproveApplicationFlow::class.java, applicationId)
@@ -309,7 +309,7 @@ class RestController(
     }
 
 
-    @PostMapping(value = "/rejectApplication", produces = arrayOf("text/plain"), headers = arrayOf("Content-Type=applcation/x-www-form-urlencoded"))
+    @PostMapping(value = "/rejectApplication")
     fun rejectApplication(@RequestParam("applicationId") applicationId: String, request: HttpServletRequest): ResponseEntity<String> {
         val applicationId = request.getParameter("applicationId")
         val flow = rpc.proxy.startFlowDynamic(RejectApplicationFlow::class.java, applicationId)

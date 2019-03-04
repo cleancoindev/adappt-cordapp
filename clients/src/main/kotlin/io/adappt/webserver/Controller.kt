@@ -18,12 +18,15 @@
 package io.adappt.webserver
 
 import io.adappt.*
+import io.adappt.account.Account
 import io.adappt.agreement.Agreement
 import io.adappt.agreement.AgreementStatus
 import io.adappt.agreement.AgreementType
 import io.adappt.application.Application
 import io.adappt.application.ApplicationStatus
 import io.adappt.claim.Claim
+import io.adappt.contact.Contact
+import io.adappt.lead.Lead
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.vaultQueryBy
@@ -99,6 +102,48 @@ class RestController(
 
 
 
+    /** Maps an Account to a JSON object. */
+
+    private fun Account.toJson(): Map<String, String> {
+        return kotlin.collections.mapOf(
+                "accountId" to accountId,
+                "accountName" to accountName,
+                "accountType" to accountType,
+                "industry" to industry,
+                "phone" to phone,
+                "owner" to owner.toString())
+    }
+
+
+    /** Maps an Contact to a JSON object. */
+
+    private fun Contact.toJson(): Map<String, String> {
+        return kotlin.collections.mapOf(
+                "contactId" to contactId,
+                "firstName" to firstName,
+                "lastName" to lastName,
+                "email" to email,
+                "phone" to phone,
+                "owner" to owner.toString())
+    }
+
+
+    /** Maps an Lead to a JSON object. */
+
+
+    private fun Lead.toJson(): Map<String, String> {
+        return kotlin.collections.mapOf(
+                "leadId" to leadId,
+                "firstName" to firstName,
+                "lastName" to lastName,
+                "email" to email,
+                "phone" to phone,
+                "owner" to owner.toString())
+    }
+
+
+
+
     /** Returns the node's name. */
     @GetMapping(value = "/me", produces = arrayOf("text/plain"))
     private fun me() = me.toString()
@@ -170,11 +215,11 @@ class RestController(
                         @RequestParam("agreementStatus") agreementStatus: AgreementStatus,
                         @RequestParam("agreementType") agreementType: AgreementType,
                         @RequestParam("totalAgreementValue") totalAgreementValue: Int,
-            //  @RequestParam("agreementStartDate") agreementStartDate: String,
-            //  @RequestParam("agreementEndDate") agreementEndDate: String,
-            //  @RequestParam("active") active: Boolean,
-            //  @RequestParam("createdAt") createdAt: String,
-            //  @RequestParam("lastUpdated") lastUpdated: String,
+            //          @RequestParam("agreementStartDate") agreementStartDate: String,
+            //          @RequestParam("agreementEndDate") agreementEndDate: String,
+            //          @RequestParam("active") active: Boolean,
+            //          @RequestParam("createdAt") createdAt: String,
+            //          @RequestParam("lastUpdated") lastUpdated: String,
                         @RequestParam("counterpartyName") counterpartyName: String?): ResponseEntity<Any?> {
 
         if (totalAgreementValue <= 0) {
@@ -323,4 +368,190 @@ class RestController(
     }
 
 
+
+    /** Returns a list of existing Accounts. */
+
+    @GetMapping(value = "/getAccounts", produces = arrayOf("application/json"))
+    fun getAccounts(): List<Map<String, String>> {
+        val accountStateAndRefs = rpc.proxy.vaultQueryBy<Account>().states
+        val accountStates = accountStateAndRefs.map { it.state.data }
+        return accountStates.map { it.toJson() }
+    }
+
+
+
+
+    /** Returns a list of existing Agreements. */
+
+    @GetMapping(value = "/getContacts", produces = arrayOf("application/json"))
+    fun getContacts(): List<Map<String, String>> {
+        val contactStateAndRefs = rpc.proxy.vaultQueryBy<Contact>().states
+        val contactStates = contactStateAndRefs.map { it.state.data }
+        return contactStates.map { it.toJson() }
+    }
+
+
+
+
+    /** Returns a list of existing Agreements. */
+
+    @GetMapping(value = "/getLeads", produces = arrayOf("application/json"))
+    fun getLeads(): List<Map<String, String>> {
+        val leadStateAndRefs = rpc.proxy.vaultQueryBy<Lead>().states
+        val leadStates = leadStateAndRefs.map { it.state.data }
+        return leadStates.map { it.toJson() }
+    }
+
+
+
+
+    /** Creates an Agreement. */
+
+    @PostMapping(value = "/createAccount")
+    fun createAccount(@RequestParam("accountId") accountId: String,
+                      @RequestParam("accountName") accountName: String,
+                      @RequestParam("accountType") accountType: String,
+                      @RequestParam("industry") industry: String,
+                      @RequestParam("phone") phone: String,
+                      @RequestParam("owner") owner: String?): ResponseEntity<Any?> {
+
+
+        if (owner == null) {
+            return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
+        }
+
+        val counterparty = CordaX500Name.parse(owner)
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(counterparty)
+                ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $owner cannot be found.\n")
+
+        val (status, message) = try {
+
+            val flowHandle = proxy.startFlowDynamic(CreateAccountFlow.Initiator::class.java, accountId, accountName, accountType, industry, phone, otherParty)
+
+            val result = flowHandle.use { it.returnValue.getOrThrow() }
+
+            HttpStatus.CREATED to "Transaction id ${result.tx.id} committed to ledger.\n${result.tx.outputs.single().data}"
+
+        } catch (e: Exception) {
+            HttpStatus.BAD_REQUEST to e.message
+        }
+        logger.info(message)
+        return ResponseEntity<Any?>(message, status)
+    }
+
+
+
+
+
+    /** Creates a Contact. */
+
+    @PostMapping(value = "/createContact")
+    fun createContact(@RequestParam("contactId") contactId: String,
+                      @RequestParam("firstName") firstName: String,
+                      @RequestParam("lastName") lastName: String,
+                      @RequestParam("email") email: String,
+                      @RequestParam("phone") phone: String,
+                      @RequestParam("owner") owner: String?): ResponseEntity<Any?> {
+
+
+        if (owner == null) {
+            return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
+        }
+
+        val counterparty = CordaX500Name.parse(owner)
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(counterparty)
+                ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $owner cannot be found.\n")
+
+        val (status, message) = try {
+
+            val flowHandle = proxy.startFlowDynamic(CreateContactFlow.Initiator::class.java, contactId, firstName, lastName, email, phone, otherParty)
+
+            val result = flowHandle.use { it.returnValue.getOrThrow() }
+
+            HttpStatus.CREATED to "Transaction id ${result.tx.id} committed to ledger.\n${result.tx.outputs.single().data}"
+
+        } catch (e: Exception) {
+            HttpStatus.BAD_REQUEST to e.message
+        }
+        logger.info(message)
+        return ResponseEntity<Any?>(message, status)
+    }
+
+
+
+
+    /** Creates a Lead. */
+
+    @PostMapping(value = "/createLead")
+    fun createLead(@RequestParam("leadId") leadId: String,
+                   @RequestParam("firstName") firstName: String,
+                   @RequestParam("lastName") lastName: String,
+                   @RequestParam("email") email: String,
+                   @RequestParam("phone") phone: String,
+                   @RequestParam("owner") owner: String?): ResponseEntity<Any?> {
+
+
+        if (owner == null) {
+            return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
+        }
+
+        val counterparty = CordaX500Name.parse(owner)
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(counterparty)
+                ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $owner cannot be found.\n")
+
+        val (status, message) = try {
+
+            val flowHandle = proxy.startFlowDynamic(CreateLeadFlow.Initiator::class.java, leadId, firstName, lastName, email, phone, otherParty)
+
+            val result = flowHandle.use { it.returnValue.getOrThrow() }
+
+            HttpStatus.CREATED to "Transaction id ${result.tx.id} committed to ledger.\n${result.tx.outputs.single().data}"
+
+        } catch (e: Exception) {
+            HttpStatus.BAD_REQUEST to e.message
+        }
+        logger.info(message)
+        return ResponseEntity<Any?>(message, status)
+    }
+
+
+
+    /** Creates a Lead. */
+
+    @PostMapping(value = "/createCase")
+    fun createCase(@RequestParam("caseId") caseId: String,
+                   @RequestParam("description") description: String,
+                   @RequestParam("caseNumber") caseNumber: String,
+                   @RequestParam("status") status: String,
+                   @RequestParam("priority") priority: String,
+                   @RequestParam("submitter") submitter: String,
+                   @RequestParam("resolver") resolver: String?): ResponseEntity<Any?> {
+
+
+        if (resolver == null) {
+            return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Query parameter 'counterPartyName' missing or has wrong format.\n")
+        }
+
+        val counterparty = CordaX500Name.parse(resolver)
+
+        val otherParty = proxy.wellKnownPartyFromX500Name(counterparty)
+                ?: return ResponseEntity.status(TSResponse.BAD_REQUEST).body("Party named $resolver cannot be found.\n")
+
+        val (status, message) = try {
+
+            val flowHandle = proxy.startFlowDynamic(CreateCaseFlow.Initiator::class.java, caseId, description, caseNumber, status, priority, submitter, otherParty)
+
+            val result = flowHandle.use { it.returnValue.getOrThrow() }
+
+            HttpStatus.CREATED to "Transaction id ${result.tx.id} committed to ledger.\n${result.tx.outputs.single().data}"
+
+        } catch (e: Exception) {
+            HttpStatus.BAD_REQUEST to e.message
+        }
+        logger.info(message)
+        return ResponseEntity<Any?>(message, status)
+    }
 }
